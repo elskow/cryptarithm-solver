@@ -30,6 +30,8 @@
   },
   "type": "module",
   "dependencies": {
+    "@fontsource-variable/fira-code": "^5.0.18",
+    "@fontsource-variable/noto-serif-tibetan": "^5.0.13",
     "@fontsource-variable/plus-jakarta-sans": "^5.0.21",
     "bits-ui": "^0.21.12",
     "clsx": "^2.1.1",

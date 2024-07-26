@@ -1,3 +1,9 @@
+<style>
+    .unselectable {
+        user-select: none;
+    }
+</style>
+
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import CryptarithmWorker from '$lib/workers/cryptarithmWorker?worker';
@@ -108,19 +114,19 @@
 
 <main class="min-h-screen flex flex-col items-center md:p-6 justify-center pb-28 pt-28">
 	<section
-		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-white rounded-sm md:rounded-xl shadow-lg max-w-2xl w-full py-12 md:py-16">
-		<h1 class="text-2xl md:text-4xl font-bold text-accent-foreground">Cryptarithm Solver</h1>
+		class="unselectable text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-accent rounded-sm md:rounded-xl max-w-2xl w-full py-12 md:py-16 filter drop-shadow-lg">
+		<h1 class="text-2xl md:text-4xl font-bold text-accent-foreground font-serif">Cryptarithm Solver</h1>
 		<p class="max-w-lg text-secondary-foreground">
 			A cryptarithm is a mathematical puzzle where the digits in an arithmetic expression are replaced by letters of the
 			alphabet. The goal is to find the correct digit for each letter so that the equation is true.
 		</p>
 		<div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-			<Button on:click={addRow} variant="secondary">Add Row</Button>
-			<Button on:click={addColumn} variant="secondary">Add Column</Button>
+			<Button on:click={addRow} title="Add a new row to the puzzle" variant="outline">Add Row</Button>
+			<Button on:click={addColumn} title="Add a new column to the puzzle" variant="outline">Add Column</Button>
 		</div>
 		<div class="flex flex-col items-center space-y-4 w-full">
 			{#each puzzle as row, rowIndex}
-				<div class="flex flex-wrap justify-center space-x-2">
+				<div class="flex flex-wrap justify-center space-x-2 font-mono">
 					{#each row as value, colIndex}
 						<input
 							type="text"
@@ -135,17 +141,19 @@
 					{/each}
 				</div>
 			{/each}
-			<Button on:click={clearForm} variant="destructive">Clear</Button>
+			<Button on:click={clearForm} title="Clear the puzzle and reset the form" variant="destructive">Clear</Button>
 		</div>
 		<div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
 			<div class="flex items-center space-x-4">
-				<select bind:value={operator} class="p-2 border border-gray-300 rounded-md">
-					{#each ['+', '-'] as op}
+				<select bind:value={operator} class="p-2 border border-gray-300 rounded-md"
+								title="Select the operator for the puzzle">
+					{#each ['+', '-', '*', '/'] as op}
 						<option value={op}>{op}</option>
 					{/each}
 				</select>
 			</div>
-			<Button disabled={isLoading} on:click={solveCryptarithm}>
+			<Button class="${isLoading ? 'cursor-not-allowed' : ''}" disabled={isLoading} on:click={solveCryptarithm}
+							title="Solve the puzzle">
 				{#if isLoading}
 					<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -162,7 +170,7 @@
 			<p class="text-red-600 mt-4">{error}</p>
 		{/if}
 		{#if solution}
-			<pre class="text-blue-600 mt-4 whitespace-pre-wrap break-words w-full md:w-auto">{solution}</pre>
+			<pre class="text-blue-600 mt-4 whitespace-pre-wrap break-words w-full md:w-auto font-mono">{solution}</pre>
 			<p class="text-gray-600">{timeExecution}</p>
 		{/if}
 	</section>
