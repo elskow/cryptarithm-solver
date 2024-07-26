@@ -110,6 +110,19 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Cryptarithm Solver</title>
+	<meta content="A cryptarithm solver that finds the correct digit for each letter in an arithmetic expression."
+				name="description" />
+	<meta content="cryptarithm, solver, puzzle, arithmetic, expression, equation, math, mathematics" name="keywords" />
+	<meta content="SvelteKit" name="author" />
+	<meta content="Cryptarithm Solver" property="og:title" />
+	<meta content="A cryptarithm solver that finds the correct digit for each letter in an arithmetic expression."
+				property="og:description" />
+	<meta content="website" property="og:type" />
+	<meta content="https://cryptarithm.helmyl.com" property="og:url" />
+</svelte:head>
+
 <main class="min-h-screen flex flex-col items-center md:p-6 justify-center">
 	<section
 		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-accent rounded-sm md:rounded-xl max-w-2xl w-full py-12 md:py-16 filter drop-shadow-lg min-h-screen md:min-h-0 pt-24 pb-24">
