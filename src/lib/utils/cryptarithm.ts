@@ -1,29 +1,4 @@
-import { json } from '@sveltejs/kit';
-
-export async function GET() {
-	const companyDetails = {
-		details: {
-			message: 'Its Works!'
-		}
-	};
-	return json(companyDetails);
-}
-
-export async function POST(event) {
-	const { puzzle, operator } = await event.request.json();
-
-
-	try {
-		const begin = Date.now();
-		const solution = solve(puzzle, operator);
-		const end = Date.now();
-		return json({ solution, time: end - begin }, { status: 200 });
-	} catch (error) {
-		return json({ error: error.message }, { status: 400 });
-	}
-}
-
-function solve(puzzle: string[][], operator: string): string {
+export function solve(puzzle: string[][], operator: string): string {
 	const letters = new Set<string>();
 	puzzle.flat().forEach(char => {
 		if (char) letters.add(char);

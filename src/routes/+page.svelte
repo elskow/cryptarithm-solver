@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import CryptarithmWorker from '$lib/workers/cryptarithmWorker?worker';
 
 	let numRows = 3;
 	let numCols = 3;
@@ -27,27 +28,30 @@
 		timeExecution = '';
 		error = '';
 		try {
-			const response = await fetch('/api/solve', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ puzzle, operator })
-			});
-			const result = await response.json();
-			if (result.error) {
-				error = result.error;
-				solution = '';
-				timeExecution = '';
-			} else {
-				solution = formatSolutionAsEquation(result.solution);
-				timeExecution = `Execution time: ${(result.time / 1000).toFixed(2)}s`;
-				error = '';
-				successMessage = 'Solution found!';
-			}
+			const worker = new CryptarithmWorker();
+			const begin = Date.now();
+
+			worker.postMessage({ puzzle, operator });
+
+			worker.onmessage = (event) => {
+				const { result, error: workerError } = event.data;
+				const end = Date.now();
+
+				if (workerError) {
+					error = workerError;
+				} else {
+					solution = formatSolutionAsEquation(result);
+					timeExecution = `Execution time: ${(end - begin) / 1000}s`;
+					successMessage = 'Solution found!';
+				}
+
+				isLoading = false;
+				worker.terminate();
+			};
 		} catch (err) {
 			error = 'An error occurred while solving the puzzle.';
 			solution = '';
 			timeExecution = '';
-		} finally {
 			isLoading = false;
 		}
 	};
@@ -104,7 +108,7 @@
 
 <main class="min-h-screen flex flex-col items-center md:p-6 justify-center pb-28 pt-28">
 	<section
-		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-white rounded-sm md:rounded-xl shadow-lg max-w-2xl w-full py-12">
+		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-white rounded-sm md:rounded-xl shadow-lg max-w-2xl w-full py-12 md:py-16">
 		<h1 class="text-2xl md:text-4xl font-bold text-accent-foreground">Cryptarithm Solver</h1>
 		<p class="max-w-lg text-secondary-foreground">
 			A cryptarithm is a mathematical puzzle where the digits in an arithmetic expression are replaced by letters of the
