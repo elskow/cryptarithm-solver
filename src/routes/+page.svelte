@@ -22,6 +22,7 @@
 		isLoading.set(true);
 		successMessage.set('');
 		solution.set('');
+		solvedPuzzle.set(Array.from({ length: $numRows }, () => Array($numCols).fill('')));
 		timeExecution.set('');
 		error.set('');
 
@@ -98,7 +99,7 @@
 
 <main class="min-h-screen flex flex-col items-center md:p-6 justify-center">
 	<section
-		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-accent rounded-sm md:rounded-xl max-w-2xl w-full py-12 md:py-16 filter drop-shadow-lg min-h-screen md:min-h-0 pt-24 pb-24">
+		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-accent rounded-sm md:rounded-xl max-w-3xl w-full py-12 md:py-16 filter drop-shadow-lg min-h-screen md:min-h-0 pt-24 pb-24">
 		<h1 class="text-2xl md:text-4xl font-bold text-accent-foreground font-serif">
 			Cryptarithm Solver
 		</h1>
@@ -143,11 +144,11 @@
 		{#if solution}
 			<div class="flex flex-col items-center space-y-4 mt-4">
 				{#each $solvedPuzzle as row, rowIndex}
-					<div class="flex flex-wrap justify-center space-x-1 md:space-x-2 font-mono">
+					<div class="flex flex-wrap justify-center space-x-1 md:space-x-2 font-mono font-bold">
 						{#each row as value, colIndex}
 							<input
 								type="text"
-								class="p-1.5 md:p-2 border border-gray-300 rounded-md w-12 text-center"
+								class="p-1.5 md:p-2 border border-gray-300 rounded-md w-12 text-center {rowIndex === $numRows - 1 ? 'border-t-4 bg-green-50/50' : ''}"
 								maxlength="1"
 								value={value}
 								disabled

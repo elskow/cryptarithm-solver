@@ -6,7 +6,7 @@
 	const handleInput = (event, rowIndex, colIndex) => {
 		const input = event.target as HTMLInputElement;
 		puzzle.update(p => {
-			p[rowIndex][colIndex] = input.value.replace(/[^A-Za-z]/g, '');
+			p[rowIndex][colIndex] = input.value.replace(/[^A-Za-z]/g, '').toUpperCase();
 			return p;
 		});
 		if (input.value && colIndex < $numCols - 1) {
@@ -38,17 +38,19 @@
 
 <div class="flex flex-col items-center space-y-4 w-full">
 	{#each $puzzle as row, rowIndex}
-		<div class="flex flex-wrap justify-center space-x-1 md:space-x-2 font-mono">
+		<div class="flex flex-wrap justify-center space-x-1 md:space-x-2 font-mono font-bold">
 			{#each row as value, colIndex}
 				<input
 					type="text"
-					class="p-1.5 md:p-2 border border-gray-300 rounded-md w-12 text-center"
+					class="p-1.5 md:p-2 border border-gray-300 rounded-md w-12 text-center {rowIndex === $numRows - 1 ? 'border-t-4 bg-green-50/50' : ''}"
 					maxlength="1"
 					bind:value={$puzzle[rowIndex][colIndex]}
 					on:input={(event) => handleInput(event, rowIndex, colIndex)}
 					on:keydown={(event) => handleKeydown(event, rowIndex, colIndex)}
 					data-row={rowIndex}
 					data-col={colIndex}
+					style="text-transform: uppercase;"
+					title={rowIndex === $numRows - 1 ? 'Result' : ''}
 				/>
 			{/each}
 		</div>
