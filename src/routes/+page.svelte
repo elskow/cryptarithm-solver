@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 
-	let expectedNumVariables = 2;
-	let puzzle = Array.from({ length: expectedNumVariables + 1 }, () => Array(expectedNumVariables + 1).fill(''));
+	let numRows = 3;
+	let numCols = 3;
+	let puzzle = Array.from({ length: numRows }, () => Array(numCols).fill(''));
 	let solution = '';
 	let timeExecution = '';
 	let error = '';
@@ -52,29 +53,29 @@
 	};
 
 	const clearForm = () => {
-		puzzle = Array.from({ length: expectedNumVariables + 1 }, () => Array(expectedNumVariables + 1).fill(''));
+		numRows = 3;
+		numCols = 3;
+		puzzle = Array.from({ length: numRows }, () => Array(numCols).fill(''));
 		solution = '';
 		timeExecution = '';
 		error = '';
 		successMessage = '';
 	};
 
-	const addField = () => {
-		expectedNumVariables++;
-		puzzle = Array.from({ length: expectedNumVariables + 1 }, () => Array(expectedNumVariables + 1).fill(''));
+	const addRow = () => {
+		numRows++;
+		puzzle = [...puzzle, Array(numCols).fill('')];
 	};
 
-	const removeField = () => {
-		if (expectedNumVariables > 2) {
-			expectedNumVariables--;
-			puzzle = Array.from({ length: expectedNumVariables + 1 }, () => Array(expectedNumVariables + 1).fill(''));
-		}
+	const addColumn = () => {
+		numCols++;
+		puzzle = puzzle.map(row => [...row, '']);
 	};
 
 	const handleInput = (event, rowIndex, colIndex) => {
 		const input = event.target as HTMLInputElement;
 		puzzle[rowIndex][colIndex] = input.value.replace(/[^A-Za-z]/g, '');
-		if (input.value && colIndex < expectedNumVariables) {
+		if (input.value && colIndex < numCols - 1) {
 			const nextInput = input.nextElementSibling as HTMLInputElement;
 			if (nextInput) nextInput.focus();
 		}
@@ -85,13 +86,13 @@
 		if (event.key === 'Backspace' && !input.value && colIndex > 0) {
 			const prevInput = input.previousElementSibling as HTMLInputElement;
 			if (prevInput) prevInput.focus();
-		} else if (event.key === 'ArrowRight' && colIndex < expectedNumVariables) {
+		} else if (event.key === 'ArrowRight' && colIndex < numCols - 1) {
 			const nextInput = input.nextElementSibling as HTMLInputElement;
 			if (nextInput) nextInput.focus();
 		} else if (event.key === 'ArrowLeft' && colIndex > 0) {
 			const prevInput = input.previousElementSibling as HTMLInputElement;
 			if (prevInput) prevInput.focus();
-		} else if (event.key === 'ArrowDown' && rowIndex < expectedNumVariables) {
+		} else if (event.key === 'ArrowDown' && rowIndex < numRows - 1) {
 			const nextRowInput = document.querySelector(`input[data-row="${rowIndex + 1}"][data-col="${colIndex}"]`) as HTMLInputElement;
 			if (nextRowInput) nextRowInput.focus();
 		} else if (event.key === 'ArrowUp' && rowIndex > 0) {
@@ -99,25 +100,19 @@
 			if (prevRowInput) prevRowInput.focus();
 		}
 	};
-
-	const formatSolution = (solution) => {
-		const lines = solution.split('\n');
-		const maxLength = Math.max(...lines.map(line => line.length));
-		return lines.map(line => line.padStart(maxLength, ' ')).join('\n');
-	};
 </script>
 
-<main class="min-h-screen flex flex-col items-center p-4 md:p-6 justify-center pb-32">
+<main class="min-h-screen flex flex-col items-center md:p-6 justify-center pb-28 pt-28">
 	<section
-		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-white rounded-xl shadow-lg max-w-2xl w-full">
-		<h1 class="text-2xl md:text-4xl font-bold text-gray-800">Cryptarithm Solver</h1>
-		<p class="max-w-lg text-gray-600">
+		class="text-center flex flex-col items-center space-y-6 p-4 md:p-8 bg-white rounded-sm md:rounded-xl shadow-lg max-w-2xl w-full py-12">
+		<h1 class="text-2xl md:text-4xl font-bold text-accent-foreground">Cryptarithm Solver</h1>
+		<p class="max-w-lg text-secondary-foreground">
 			A cryptarithm is a mathematical puzzle where the digits in an arithmetic expression are replaced by letters of the
 			alphabet. The goal is to find the correct digit for each letter so that the equation is true.
 		</p>
 		<div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-			<Button on:click={addField} variant="secondary">Increase Field</Button>
-			<Button on:click={removeField} variant="secondary">Decrease Field</Button>
+			<Button on:click={addRow} variant="secondary">Add Row</Button>
+			<Button on:click={addColumn} variant="secondary">Add Column</Button>
 		</div>
 		<div class="flex flex-col items-center space-y-4 w-full">
 			{#each puzzle as row, rowIndex}
@@ -125,7 +120,7 @@
 					{#each row as value, colIndex}
 						<input
 							type="text"
-							class="p-2 border border-gray-300 rounded-md w-9 md:w-12 text-center"
+							class="p-2 border border-gray-300 rounded-md w-12 text-center"
 							maxlength="1"
 							bind:value={puzzle[rowIndex][colIndex]}
 							on:input={(event) => handleInput(event, rowIndex, colIndex)}
