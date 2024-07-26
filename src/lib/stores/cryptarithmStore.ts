@@ -9,3 +9,5 @@ export const error = writable('');
 export const operator = writable('+');
 export const isLoading = writable(false);
 export const successMessage = writable('');
+
+export const solvedPuzzle = writable(Array.from({ length: 3 }, () => Array(3).fill('')));

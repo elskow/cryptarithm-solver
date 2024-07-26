@@ -9,6 +9,7 @@
 		operator,
 		puzzle,
 		solution,
+		solvedPuzzle,
 		successMessage,
 		timeExecution
 	} from '$lib/stores/cryptarithmStore';
@@ -17,48 +18,41 @@
 
 	let worker: Worker;
 
-	const formatSolutionAsEquation = (solution: string): string => {
-		const lines = solution.split('\n');
-		const maxLength = Math.max(...lines.map(line => line.length));
-		const formattedLines = lines.map(line => line.padStart(maxLength, ' '));
-		const equation = formattedLines.join('\n');
-		const separator = '-'.repeat(maxLength);
-		return `${equation}\n${separator}`;
-	};
-
 	const solveCryptarithm = async () => {
 		isLoading.set(true);
 		successMessage.set('');
 		solution.set('');
 		timeExecution.set('');
 		error.set('');
-		try {
-			worker = new CryptarithmWorker();
-			const begin = Date.now();
 
-			worker.postMessage({ puzzle: $puzzle, operator: $operator });
+		worker = new CryptarithmWorker();
+		const begin = Date.now();
 
-			worker.onmessage = (event) => {
-				const { result, error: workerError } = event.data;
-				const end = Date.now();
+		worker.postMessage({ puzzle: $puzzle, operator: $operator });
 
-				if (workerError) {
-					error.set(workerError);
-				} else {
-					solution.set(formatSolutionAsEquation(result));
-					timeExecution.set(`Execution time: ${(end - begin) / 1000}s`);
-					successMessage.set('Solution found!');
-				}
+		worker.onmessage = (event) => {
+			const { result, error: workerError } = event.data;
+			const end = Date.now();
 
-				isLoading.set(false);
-				worker.terminate();
-			};
-		} catch (err) {
-			error.set('An error occurred while solving the puzzle.');
-			solution.set('');
-			timeExecution.set('');
+			if (workerError) {
+				error.set(workerError);
+			} else {
+				solution.set(result);
+				timeExecution.set(`Execution time: ${(end - begin) / 1000}s`);
+				successMessage.set('Solution found!');
+
+				const resultObj = JSON.parse(result);
+
+				const solvedPuzzleArr = $puzzle.map((row) => row.map((value) => {
+					if (value === '') return '';
+					return resultObj.hasOwnProperty(value) ? resultObj[value] : value;
+				}));
+				solvedPuzzle.set(solvedPuzzleArr);
+			}
+
 			isLoading.set(false);
-		}
+			worker.terminate();
+		};
 	};
 
 	onDestroy(() => {
@@ -69,6 +63,7 @@
 		numRows.set(3);
 		numCols.set(3);
 		puzzle.set(Array.from({ length: 3 }, () => Array(3).fill('')));
+		solvedPuzzle.set(Array.from({ length: 3 }, () => Array(3).fill('')));
 		solution.set('');
 		timeExecution.set('');
 		error.set('');
@@ -78,11 +73,13 @@
 	const addRow = () => {
 		numRows.update(n => n + 1);
 		puzzle.update(p => [...p, Array($numCols).fill('')]);
+		solvedPuzzle.update(p => [...p, Array($numCols).fill('')]);
 	};
 
 	const addColumn = () => {
 		numCols.update(n => n + 1);
 		puzzle.update(p => p.map(row => [...row, '']));
+		solvedPuzzle.update(p => p.map(row => [...row, '']));
 	};
 </script>
 
@@ -143,22 +140,41 @@
 		{#if $error}
 			<p class="text-red-600 mt-4">{$error}</p>
 		{/if}
-		{#if $solution}
-			<pre class="text-blue-600 mt-4 whitespace-pre-wrap break-words w-full md:w-auto font-mono">{$solution}</pre>
-			<p class="text-gray-600">{$timeExecution}</p>
+		{#if solution}
+			<div class="flex flex-col items-center space-y-4 mt-4">
+				{#each $solvedPuzzle as row, rowIndex}
+					<div class="flex flex-wrap justify-center space-x-1 md:space-x-2 font-mono">
+						{#each row as value, colIndex}
+							<input
+								type="text"
+								class="p-1.5 md:p-2 border border-gray-300 rounded-md w-12 text-center"
+								maxlength="1"
+								value={value}
+								disabled
+							/>
+						{/each}
+					</div>
+				{/each}
+				<p class="text-secondary-foreground">
+					{$timeExecution}
+				</p>
+			</div>
 		{/if}
 	</section>
-	<footer class="text-center text-sm text-secondary-foreground mt-8 bg-accent/90 px-4 py-2 hidden md:block">
+	<footer
+		class="text-center text-sm text-secondary-foreground mt-8 bg-accent/20 px-6 py-2 hidden md:block filter backdrop-blur-lg rounded-xl">
 		<p>
 			Developed by
 			<a
 				class="underline underline-offset-4 hover:text-blue-800"
-				href="https://helmy.dev" target="_blank">
+				href="https://helmyl.com" target="_blank"
+				title="Helmy's personal website">
 				Helmy
 			</a> | Source code on{' '}
 			<a
 				class="underline underline-offset-4 hover:text-blue-800"
-				href="https://github.com/elskow" target="_blank">
+				href="https://github.com/elskow/cryptarithm-solver" target="_blank"
+				title="Cryptarithm Solver on GitHub">
 				GitHub
 			</a>
 			.
