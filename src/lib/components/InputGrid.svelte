@@ -13,13 +13,20 @@
 			const nextInput = input.nextElementSibling as HTMLInputElement;
 			if (nextInput) nextInput.focus();
 		}
+
+		input.setSelectionRange(input.value.length, input.value.length); // Move cursor to the end
 	};
 
 	const handleKeydown = (event, rowIndex, colIndex) => {
 		const input = event.target as HTMLInputElement;
-		if (event.key === 'Backspace' && !input.value && colIndex > 0) {
-			const prevInput = input.previousElementSibling as HTMLInputElement;
-			if (prevInput) prevInput.focus();
+		if (event.key === 'Backspace') {
+			if (!input.value && colIndex > 0) {
+				const prevInput = input.previousElementSibling as HTMLInputElement;
+				if (prevInput) {
+					prevInput.focus();
+					prevInput.setSelectionRange(prevInput.value.length, prevInput.value.length);
+				}
+			}
 		} else if (event.key === 'ArrowRight' && colIndex < $numCols - 1) {
 			const nextInput = input.nextElementSibling as HTMLInputElement;
 			if (nextInput) nextInput.focus();

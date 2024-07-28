@@ -14,22 +14,14 @@
 		timeExecution
 	} from '$lib/stores/cryptarithmStore';
 	import InputGrid from '$lib/components/InputGrid.svelte';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import DropdownOperator from '$lib/components/DropdownOperator.svelte';
 
 	let worker: Worker;
+	let begin: number;
 
-	const solveCryptarithm = async () => {
-		isLoading.set(true);
-		successMessage.set('');
-		solution.set('');
-		solvedPuzzle.set(Array.from({ length: $numRows }, () => Array($numCols).fill('')));
-		timeExecution.set('');
-		error.set('');
-
+	onMount(() => {
 		worker = new CryptarithmWorker();
-		const begin = Date.now();
-
-		worker.postMessage({ puzzle: $puzzle, operator: $operator });
 
 		worker.onmessage = (event) => {
 			const { result, error: workerError } = event.data;
@@ -46,19 +38,32 @@
 
 				const solvedPuzzleArr = $puzzle.map((row) => row.map((value) => {
 					if (value === '') return '';
+
 					return resultObj.hasOwnProperty(value) ? resultObj[value] : value;
 				}));
 				solvedPuzzle.set(solvedPuzzleArr);
 			}
 
 			isLoading.set(false);
-			worker.terminate();
 		};
-	};
 
-	onDestroy(() => {
-		if (worker) worker.terminate();
+		onDestroy(() => {
+			worker.terminate();
+		});
 	});
+
+	const solveCryptarithm = async () => {
+		isLoading.set(true);
+		successMessage.set('');
+		solution.set('');
+		solvedPuzzle.set(Array.from({ length: $numRows }, () => Array($numCols).fill('')));
+		timeExecution.set('');
+		error.set('');
+
+		begin = Date.now();
+
+		worker.postMessage({ puzzle: $puzzle, operator: $operator });
+	};
 
 	const clearForm = () => {
 		numRows.set(3);
@@ -116,14 +121,7 @@
 			<Button on:click={clearForm} title="Clear the puzzle and reset the form" variant="destructive">Clear</Button>
 		</div>
 		<div class="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-4">
-			<div class="flex items-center space-x-4">
-				<select bind:value={$operator} class="p-2 border border-gray-300 rounded-md"
-								title="Select the operator for the puzzle">
-					{#each ['+', '-', '*', '/'] as op}
-						<option value={op}>{op}</option>
-					{/each}
-				</select>
-			</div>
+			<DropdownOperator {operator} />
 			<Button class="{$isLoading ? 'cursor-not-allowed' : ''}" disabled={$isLoading} on:click={solveCryptarithm}
 							title="Solve the puzzle">
 				{#if $isLoading}
