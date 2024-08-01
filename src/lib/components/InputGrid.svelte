@@ -10,35 +10,47 @@
 			return p;
 		});
 		if (input.value && colIndex < $numCols - 1) {
-			const nextInput = input.nextElementSibling as HTMLInputElement;
-			if (nextInput) nextInput.focus();
+			setTimeout(() => {
+				const nextInput = input.nextElementSibling as HTMLInputElement;
+				if (nextInput) nextInput.focus();
+			}, 0);
 		}
 
-		input.setSelectionRange(input.value.length, input.value.length); // Move cursor to the end
+		input.setSelectionRange(input.value.length, input.value.length);
 	};
 
 	const handleKeydown = (event, rowIndex, colIndex) => {
 		const input = event.target as HTMLInputElement;
 		if (event.key === 'Backspace') {
 			if (!input.value && colIndex > 0) {
-				const prevInput = input.previousElementSibling as HTMLInputElement;
-				if (prevInput) {
-					prevInput.focus();
-					prevInput.setSelectionRange(prevInput.value.length, prevInput.value.length);
-				}
+				setTimeout(() => {
+					const prevInput = input.previousElementSibling as HTMLInputElement;
+					if (prevInput) {
+						prevInput.focus();
+						prevInput.setSelectionRange(prevInput.value.length, prevInput.value.length);
+					}
+				}, 0);
 			}
 		} else if (event.key === 'ArrowRight' && colIndex < $numCols - 1) {
-			const nextInput = input.nextElementSibling as HTMLInputElement;
-			if (nextInput) nextInput.focus();
+			setTimeout(() => {
+				const nextInput = input.nextElementSibling as HTMLInputElement;
+				if (nextInput) nextInput.focus();
+			}, 0);
 		} else if (event.key === 'ArrowLeft' && colIndex > 0) {
-			const prevInput = input.previousElementSibling as HTMLInputElement;
-			if (prevInput) prevInput.focus();
+			setTimeout(() => {
+				const prevInput = input.previousElementSibling as HTMLInputElement;
+				if (prevInput) prevInput.focus();
+			}, 0);
 		} else if (event.key === 'ArrowDown' && rowIndex < $numRows - 1) {
-			const nextRowInput = document.querySelector(`input[data-row="${rowIndex + 1}"][data-col="${colIndex}"]`) as HTMLInputElement;
-			if (nextRowInput) nextRowInput.focus();
+			setTimeout(() => {
+				const nextRowInput = document.querySelector(`input[data-row="${rowIndex + 1}"][data-col="${colIndex}"]`) as HTMLInputElement;
+				if (nextRowInput) nextRowInput.focus();
+			}, 0);
 		} else if (event.key === 'ArrowUp' && rowIndex > 0) {
-			const prevRowInput = document.querySelector(`input[data-row="${rowIndex - 1}"][data-col="${colIndex}"]`) as HTMLInputElement;
-			if (prevRowInput) prevRowInput.focus();
+			setTimeout(() => {
+				const prevRowInput = document.querySelector(`input[data-row="${rowIndex - 1}"][data-col="${colIndex}"]`) as HTMLInputElement;
+				if (prevRowInput) prevRowInput.focus();
+			}, 0);
 		}
 	};
 </script>
