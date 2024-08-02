@@ -47,8 +47,11 @@
 			isLoading.set(false);
 		};
 
+		document.addEventListener('keydown', handleKeyDown);
+
 		onDestroy(() => {
 			worker.terminate();
+			document.removeEventListener('keydown', handleKeyDown);
 		});
 	});
 
@@ -86,6 +89,12 @@
 		numCols.update(n => n + 1);
 		puzzle.update(p => p.map(row => [...row, '']));
 		solvedPuzzle.update(p => p.map(row => [...row, '']));
+	};
+
+	const handleKeyDown = (event: KeyboardEvent) => {
+		if (event.key === 'Enter') {
+			solveCryptarithm();
+		}
 	};
 </script>
 
