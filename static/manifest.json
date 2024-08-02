@@ -1,6 +1,7 @@
 {
     "name": "Cryptarithm Solver",
     "short_name": "Cryptarithm Solver",
+    "start_url": "https://cryptarithm.helmyl.com",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
